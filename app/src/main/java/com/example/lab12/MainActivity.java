@@ -3,7 +3,10 @@ package com.example.lab12;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.Spinner;
@@ -37,17 +40,83 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        EditText eur = (EditText) findViewById(R.id.euro_value);
+        EditText pln = (EditText) findViewById(R.id.pln_value);
+        EditText usd = (EditText) findViewById(R.id.usd_value);
+        EditText chf = (EditText) findViewById(R.id.chf_value);
+
+        eur.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+            }
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+            }
+            @Override
+            public void afterTextChanged(Editable editable) {
+                convert();
+            }
+        });
+        pln.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+            }
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+            }
+            @Override
+            public void afterTextChanged(Editable editable) {
+                convert();
+            }
+        });
+        usd.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+            }
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+            }
+            @Override
+            public void afterTextChanged(Editable editable) {
+                convert();
+            }
+        });
+        chf.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+            }
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+            }
+            @Override
+            public void afterTextChanged(Editable editable) {
+                convert();
+            }
+        });
         Spinner spinner = (Spinner) findViewById(R.id.spinner);
         ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,
                 R.array.currencies, android.R.layout.simple_spinner_item);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinner.setAdapter(adapter);
+        spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener(){
+            @Override
+            public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+                convert();
+            }
+            @Override
+            public void onNothingSelected(AdapterView<?> adapterView) {
+            }
+        });
         getIPInfo();
 }
 
-    public void buttonPress(View view) {
+    public void convert() {
         Spinner spinner  = (Spinner) findViewById(R.id.spinner);
         TextView textView = (TextView) findViewById(R.id.sum);
+        TextView euro_p = (TextView) findViewById(R.id.euro_p);
+        TextView pln_p = (TextView) findViewById(R.id.pln_p);
+        TextView usd_p = (TextView) findViewById(R.id.usd_p);
+        TextView chf_p = (TextView) findViewById(R.id.chf_p);
         EditText eur = (EditText) findViewById(R.id.euro_value);
         EditText pln = (EditText) findViewById(R.id.pln_value);
         EditText usd = (EditText) findViewById(R.id.usd_value);
@@ -86,6 +155,18 @@ public class MainActivity extends AppCompatActivity {
 
         Double pocket = usdInPln + chfInPln + eurInPln + plnInPln;
 
+        if (pocket.equals(0.0)){
+            euro_p.setText("0.00%");
+            usd_p.setText("0.00%");
+            pln_p.setText("0.00%");
+            chf_p.setText("0.00%");
+        }else {
+            euro_p.setText(String.format("%.2f", (eurInPln / pocket) * 100) + "%");
+            usd_p.setText(String.format("%.2f", (usdInPln / pocket) * 100) + "%");
+            pln_p.setText(String.format("%.2f", (plnInPln / pocket) * 100) + "%");
+            chf_p.setText(String.format("%.2f", (chfInPln / pocket) * 100) + "%");
+        }
+
         if(actual_currency.equals ((String) "USD")){
             pocket = pocket/usd_rate;
         }
@@ -95,7 +176,6 @@ public class MainActivity extends AppCompatActivity {
         if(actual_currency.equals((String) "CHF")){
             pocket = pocket/chf_rate;
         }
-
         String strPocket = String.format("%.2f", pocket);
         textView.setText(strPocket);
     }
